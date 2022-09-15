@@ -102,6 +102,13 @@ describe("Database contract", function () {
   })
 
   describe("Store and read data", function () {
+
+    async function storeData(db: Database, enocdedData: string, signature: string, timestamp: number) {
+      // store data
+      let tx = await db.storeData(enocdedData, signature, timestamp, CHIAN_ID, CONTRACT_ADDRESS)
+      await tx.wait();
+    }
+
     it("Should store new data", async function () {
       const { db, owner, enocdedData, timestamp, eachEncodedData }: DatabaseFixture = await loadFixture(deployDatabaseFixture);
       const signature = await sign(enocdedData, timestamp, owner)
@@ -134,8 +141,7 @@ describe("Database contract", function () {
       const signature = await sign(enocdedData, timestamp, owner)
 
       // store data
-      let tx = await db.storeData(enocdedData, signature, timestamp, CHIAN_ID, CONTRACT_ADDRESS)
-      await tx.wait()
+      await storeData(db, enocdedData, signature, timestamp)
 
       // update data
       const newData: RawData[] = [{ name: "contractAddress", type: "address", value: "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45" }, { name: "num", type: "uint256", value: 5 }, { name: "usernames", type: "string[]", value: ["A", "Da", "Chi"] }];
@@ -147,7 +153,7 @@ describe("Database contract", function () {
       const newEnocdedData = utils.defaultAbiCoder.encode(["tuple(string name, uint256 timestamp, bytes value)[] DataFeed"], [newEachEncodedData])
 
       const newSignature = sign(newEnocdedData, newTimestamp, owner)
-      tx = await db.storeData(newEnocdedData, newSignature, newTimestamp, CHIAN_ID, CONTRACT_ADDRESS)
+      const tx = await db.storeData(newEnocdedData, newSignature, newTimestamp, CHIAN_ID, CONTRACT_ADDRESS)
       await tx.wait()
 
       const resTx: ContractReceipt = await tx.wait()
@@ -181,6 +187,45 @@ describe("Database contract", function () {
             .to.not.equal(newTimestamp)
           expect(value)
             .to.not.equal(newValue)
+        }
+      }
+    })
+    it("Should read single data", async function () {
+      const { db, owner, enocdedData, timestamp, rawData }: DatabaseFixture = await loadFixture(deployDatabaseFixture);
+      const signature = await sign(enocdedData, timestamp, owner)
+
+      // store data
+      await storeData(db, enocdedData, signature, timestamp)
+
+      // read data(address contractAddress)
+      const data: string[] = await db.readDataFeed(CHIAN_ID, CONTRACT_ADDRESS, ["contractAddress"]);
+
+      expect(data.length).to.equal(1)
+
+      const decodedData = ethers.utils.defaultAbiCoder.decode(["address"], data[data.length - 1])
+      expect(decodedData[0]).to.equal(rawData[0].value)
+
+    })
+
+    it("Should read multiple data", async function () {
+      const { db, owner, enocdedData, timestamp, rawData }: DatabaseFixture = await loadFixture(deployDatabaseFixture);
+      const signature = await sign(enocdedData, timestamp, owner)
+
+      // store data
+      await storeData(db, enocdedData, signature, timestamp)
+
+      // read data(address contractAddress)
+      const data = await db.readDataFeed(CHIAN_ID, CONTRACT_ADDRESS, ["contractAddress", "num", "usernames"]);
+
+      expect(data.length).to.equal(3)
+      for (let i = 0; i < data.length; i++) {
+        const decodedData = ethers.utils.defaultAbiCoder.decode([rawData[i].type], data[i])
+        if (Array.isArray(rawData[i].value)) {
+          for (let j = 0; j < rawData[i].value.length; j++) {
+            expect(decodedData[0][i]).to.equal(rawData[i].value[i])
+          }
+        } else {
+          expect(decodedData[0]).to.equal(rawData[i].value)
         }
       }
     })

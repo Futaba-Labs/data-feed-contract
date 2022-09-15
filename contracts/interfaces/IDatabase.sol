@@ -29,7 +29,7 @@ interface IDatabase {
         uint32 srcChainId,
         address srcContract,
         string[] calldata valuableNames
-    ) external view returns (bytes memory value);
+    ) external view returns (bytes[] memory values);
 
     function deriveDBId(
         uint32 srcChainId,

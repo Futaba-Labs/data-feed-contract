@@ -49,9 +49,16 @@ contract Database is IDatabase {
         uint32 srcChainId,
         address srcContract,
         string[] calldata valuableNames
-    ) external view returns (bytes memory value) {
-        // bytes32 id = this.deriveDBId(srcChainId, srcContract, valuableName);
-        // value = dataFeeds[id].value;
+    ) external view returns (bytes[] memory values) {
+        values = new bytes[](valuableNames.length);
+        for (uint256 i = 0; i < valuableNames.length; i++) {
+            bytes32 id = this.deriveDBId(
+                srcChainId,
+                srcContract,
+                valuableNames[i]
+            );
+            values[i] = dataFeeds[id].value;
+        }
     }
 
     function verifySignature(
