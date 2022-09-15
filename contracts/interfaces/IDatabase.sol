@@ -4,8 +4,8 @@ pragma solidity ^0.8.9;
 interface IDatabase {
     struct DataFeed {
         string name;
-        bytes value;
         uint256 timestamp;
+        bytes value;
     }
 
     event UpdatedValue(
@@ -18,10 +18,9 @@ interface IDatabase {
     function setSigner(address signer) external;
 
     function storeData(
-        DataFeed[] calldata data,
+        bytes calldata data,
         bytes calldata signature,
         uint256 timestamp,
-        address futabaNode,
         uint32 srcChainId,
         address srcContract
     ) external payable;
@@ -35,6 +34,6 @@ interface IDatabase {
     function deriveDBId(
         uint32 srcChainId,
         address srcContract,
-        string calldata valuableName
+        string memory valuableName
     ) external pure returns (bytes32 id);
 }
