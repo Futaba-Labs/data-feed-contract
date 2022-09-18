@@ -4,6 +4,12 @@ pragma solidity ^0.8.9;
 import "./interfaces/IDatabase.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
+/**
+ * @title Database from other chain data
+ * @author Tomoki Adachi
+ * @notice You can use this contract for storing and reading data
+ */
+
 contract Database is IDatabase {
     using ECDSA for bytes32;
 
@@ -11,9 +17,25 @@ contract Database is IDatabase {
 
     mapping(bytes32 => DataFeed) private dataFeeds;
 
+    /**
+     * @notice Set signer who stores data
+     * @dev Set signer address
+     * @param signer The signer's address
+     */
+
     function setSigner(address signer) external {
         signers.push(signer);
     }
+
+    /**
+     * @notice Verify siganture and store data
+     * @dev Decode into an array per variable
+     * @param data Other chain data
+     * @param signature Signature using data and timestamp
+     * @param timestamp Time data was acquired
+     * @param srcChainId Chain ID of data acquisition destination
+     * @param srcContract Contract address from which data is acquired
+     */
 
     function storeData(
         bytes calldata data,
@@ -32,6 +54,14 @@ contract Database is IDatabase {
         updateDataFeed(srcChainId, srcContract, feeds);
     }
 
+    /**
+     * @notice Update data
+     * @dev Assigning data to mapping
+     * @param srcChainId Chain ID of data acquisition destination
+     * @param srcContract Contract address from which data is acquired
+     * @param data Other chain data(array per variable)
+     */
+
     function updateDataFeed(
         uint32 srcChainId,
         address srcContract,
@@ -44,6 +74,13 @@ contract Database is IDatabase {
             emit UpdatedValue(id, d.name, d.timestamp, d.value);
         }
     }
+
+    /**
+     * @notice Reda data
+     * @param srcChainId Chain ID of data acquisition destination
+     * @param srcContract Contract address from which data is acquired
+     * @param valuableNames Variable names of the data to be acquired
+     */
 
     function readDataFeed(
         uint32 srcChainId,
@@ -60,6 +97,13 @@ contract Database is IDatabase {
             values[i] = dataFeeds[id].value;
         }
     }
+
+    /**
+     * @notice Verify signture
+     * @param data Other chain data
+     * @param signature Signature using data and timestamp
+     * @param timestamp Time data was acquired
+     */
 
     function verifySignature(
         bytes calldata data,
@@ -79,6 +123,11 @@ contract Database is IDatabase {
         return true;
     }
 
+    /**
+     * @notice Verify authorized signer
+     * @param _signer Transaction sender
+     */
+
     function verifySigner(address _signer) private view returns (bool) {
         for (uint256 i = 0; i < signers.length; i++) {
             if (signers[i] == _signer) {
@@ -87,6 +136,14 @@ contract Database is IDatabase {
         }
         return false;
     }
+
+    /**
+     * @notice Calculate database ID
+     * @dev Encode and hash chainId, contract address, and variable name
+     * @param srcChainId Chain ID of data acquisition destination
+     * @param srcChainId Contract address from which data is acquired
+     * @param valuableName Variable name of the data to be acquired
+     */
 
     function deriveDBId(
         uint32 srcChainId,
