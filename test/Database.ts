@@ -49,7 +49,7 @@ describe("Database contract", function () {
     const eachEncodedData: DataFeed[] = rawData.map(d => {
       return { name: d.name, timestamp: BigNumber.from(timestamp), value: utils.defaultAbiCoder.encode([d.type], [d.value]) }
     })
-    const enocdedData = utils.defaultAbiCoder.encode(["tuple(string name, uint256 timestamp, bytes value)[] DataFeed"], [eachEncodedData])
+    const enocdedData = await db.encode(eachEncodedData)
 
     await db.setSigner(owner.getAddress())
 
@@ -58,7 +58,7 @@ describe("Database contract", function () {
 
   // implement signature method
   async function sign(enocdedData: string, timestamp: number, owner: SignerWithAddress) {
-    const messageHash = ethers.utils.solidityKeccak256(["bytes", "uint256"], [enocdedData, timestamp])
+    const messageHash = ethers.utils.solidityKeccak256(["bytes"], [enocdedData])
     const signature = await owner.signMessage(ethers.utils.arrayify(messageHash));
     return signature
   }
@@ -68,22 +68,23 @@ describe("Database contract", function () {
       const { db, owner, enocdedData, timestamp }: DatabaseFixture = await loadFixture(deployDatabaseFixture);
 
       // create signature
-      const messageHash = ethers.utils.solidityKeccak256(["bytes", "uint256"], [enocdedData, timestamp])
+      const messageHash = ethers.utils.solidityKeccak256(["bytes"], [enocdedData])
       const signature = await owner.signMessage(ethers.utils.arrayify(messageHash));
 
       // verify signature on contract
-      expect(await db.verifySignature(enocdedData, signature, timestamp)).to.equal(true)
+      expect(await db.verifySignature(enocdedData, signature)).to.equal(true)
     });
 
     it("Should be invalid signture", async function () {
       const { db, owner, enocdedData, timestamp }: DatabaseFixture = await loadFixture(deployDatabaseFixture);
 
       // create signature
-      const messageHash = ethers.utils.solidityKeccak256(["bytes", "uint256"], [enocdedData, timestamp + 1])
+      let messageHash = ethers.utils.solidityKeccak256(["bytes"], [enocdedData])
+      messageHash = ethers.utils.solidityKeccak256(["bytes"], [messageHash])
       const signature = await owner.signMessage(ethers.utils.arrayify(messageHash));
 
       // verify signature on contract
-      await expect(db.verifySignature(enocdedData, signature, timestamp)).to.be.revertedWith("Signature doesn't match");
+      await expect(db.verifySignature(enocdedData, signature)).to.be.revertedWith("Signature doesn't match");
     });
 
     it("Should not be authorized signer", async function () {
@@ -93,11 +94,11 @@ describe("Database contract", function () {
       const contract = db.connect(addr1);
 
       // create signature
-      const messageHash = ethers.utils.solidityKeccak256(["bytes", "uint256"], [enocdedData, timestamp])
+      const messageHash = ethers.utils.solidityKeccak256(["bytes"], [enocdedData])
       const signature = await addr1.signMessage(ethers.utils.arrayify(messageHash));
 
       // verify signature on contract
-      await expect(contract.verifySignature(enocdedData, signature, timestamp)).to.be.revertedWith("Not authorized signer");
+      await expect(contract.verifySignature(enocdedData, signature)).to.be.revertedWith("Not authorized signer");
     });
   })
 
@@ -150,7 +151,7 @@ describe("Database contract", function () {
       const newEachEncodedData: DataFeed[] = newData.map(d => {
         return { name: d.name, timestamp: BigNumber.from(newTimestamp), value: utils.defaultAbiCoder.encode([d.type], [d.value]) }
       })
-      const newEnocdedData = utils.defaultAbiCoder.encode(["tuple(string name, uint256 timestamp, bytes value)[] DataFeed"], [newEachEncodedData])
+      const newEnocdedData = await db.encode(newEachEncodedData)
 
       const newSignature = sign(newEnocdedData, newTimestamp, owner)
       const tx = await db.storeData(newEnocdedData, newSignature, newTimestamp, CHIAN_ID, CONTRACT_ADDRESS)

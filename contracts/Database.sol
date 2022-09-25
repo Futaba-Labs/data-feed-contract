@@ -46,7 +46,7 @@ contract Database is IDatabase {
     ) external payable {
         // verify signature
         require(
-            verifySignature(data, signature, timestamp),
+            verifySignature(data, signature),
             "Signature mismatch"
         );
 
@@ -102,16 +102,14 @@ contract Database is IDatabase {
      * @notice Verify signture
      * @param data Other chain data
      * @param signature Signature using data and timestamp
-     * @param timestamp Time data was acquired
      */
 
     function verifySignature(
         bytes calldata data,
-        bytes calldata signature,
-        uint256 timestamp
+        bytes calldata signature
     ) public view returns (bool) {
         address signer = (
-            keccak256(abi.encodePacked(data, timestamp))
+            keccak256(abi.encodePacked(data))
                 .toEthSignedMessageHash()
         ).recover(signature);
         require(
@@ -151,5 +149,9 @@ contract Database is IDatabase {
         string memory valuableName
     ) public pure returns (bytes32 id) {
         id = keccak256(abi.encodePacked(srcChainId, srcContract, valuableName));
+    }
+
+    function encode(DataFeed[] calldata feed) external pure returns (bytes memory) {
+        return abi.encode(feed);
     }
 }
