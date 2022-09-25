@@ -15,7 +15,7 @@ interface RawData {
 }
 dotenv.config({ path: '../.env' });
 const privateKey = process.env.PRIVATE_KEY !== undefined ? process.env.PRIVATE_KEY : "";
-const contractAddress = "0x105990E8EbCd11F065304fB1Db79889176B24AFA";
+const contractAddress = "0xd737408b3CE7c6559496ea0cAde16A951945356b";
 const srcContractAddress = "0x1F98431c8aD98523631AE4a59f267346ea31F984"
 
 async function sendData(): Promise<void> {
@@ -35,7 +35,7 @@ async function sendData(): Promise<void> {
 
   await contract.setSigner(await walletWithProvider.getAddress())
 
-  const messageHash = ethers.utils.solidityKeccak256(["bytes", "uint256"], [enocdedData, timestamp])
+  const messageHash = ethers.utils.solidityKeccak256(["bytes"], [enocdedData])
   const signature = await walletWithProvider.signMessage(ethers.utils.arrayify(messageHash));
 
   const chainId = await walletWithProvider.getChainId()
