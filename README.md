@@ -20,9 +20,16 @@ It also supports multiple chains.
 - Aurora
 - Oasis
 
+In this hackathon, we are getting data about APY from Optimism's AAVE contract and sending the data to Polygon testnet's contract.
+
+- SM dataBase deployed on Polygon : https://mumbai.polygonscan.com/address/0xd737408b3ce7c6559496ea0cade16a951945356b
+- Aave contract : https://optimistic.etherscan.io/address/0x794a61358d6845594f94dc1db02a252b5b4814ad#code
+
 ## How it Works
 
-1. Register the data that the developer wants to FEED in the database.
+(architecture.png)
+
+1. Register the data that the developer wants to feed in the database.
 2. Futaba's node triggers the event and retrieves the data from a specific chain or a specific contract.
 3. The data is signed and stored in the database contract.
 4. The developer can access the data retrieved from the database contract
