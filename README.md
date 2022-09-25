@@ -2,7 +2,7 @@
 # Deployment 
 
 
-Futaba DataBase contract deployed to Polygon [Mumbai](https://mumbai.polygonscan.com/address/0xd737408b3ce7c6559496ea0cade16a951945356b)
+Futaba DataBase contract deployed to [Mumbai](https://mumbai.polygonscan.com/address/0xd737408b3ce7c6559496ea0cade16a951945356b)
 
 
 
