@@ -27,7 +27,7 @@ In this hackathon, we are getting data about APY from Optimism's AAVE contract a
 
 ## How it Works
 
-(architecture.png)
+![Architecture](architecture.png)
 
 1. Register the data that the developer wants to feed in the database.
 2. Futaba's node triggers the event and retrieves the data from a specific chain or a specific contract.
