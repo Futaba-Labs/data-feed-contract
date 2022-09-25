@@ -1,13 +1,56 @@
-# Sample Hardhat Project
+# ETHOnline 2022 -- Futaba
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This is the official ETHOnline 2022 submission for our project Futaba 🍃.
 
-Try running some of the following tasks:
+## Project Description
 
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
+We propose **Futaba**, a protocol dedicated to retrieving data from other chains on smart contracts.
+The developer flexibly defines the data he/she wants to acquire from other chains, and based on this, Futaba will request data from the target contract when data changes occur for the target contract. After acquiring the data, Futaba will send the data to the contract of the specific chain.
+In other words, like The Graph, you can freely define the data you want to acquire, and the data is sent to a specific contract, like Oracle's data feed.
+
+## Features
+
+Off-chain data, but not on-chain data from other chains can be retrieved on a regular basis
+It also allows for more flexible data acquisition, as developers can freely configure what kind of data they want to acquire and which events are triggered.
+It also supports multiple chains.
+
+- Polygon
+- Optimism
+- Cronos
+- Aurora
+- Oasis
+
+## How it Works
+
+1. Register the data that the developer wants to FEED in the database.
+2. Futaba's node triggers the event and retrieves the data from a specific chain or a specific contract.
+3. The data is signed and stored in the database contract.
+4. The developer can access the data retrieved from the database contract
+
+## What's next for Futaba ?
+
+We are planning to add many features such as :
+
+- Development of Futaba use cases : a cross-chain yield aggregator for more efficient operation of DeFi.
+- Improved security of data acquisition : further security and decentralization using TSS + MPC
+
+## Getting Started
+
+```bash
+# Install dependencies
+yarn install
+# execute test
+yarn hardhat test
 ```
+
+## Twitter :
+
+- Account : https://twitter.com/FutabaDex
+
+## Contact Information :
+
+Preferred contact information : You can contact the team on the address : kato_goki@andlaw.co.jp
+
+## More Detail :
+
+For more information about the project, please refer to [this](https://first-twine-2d1.notion.site/Lite-Paper-ae6f767832c6449d8fda1c74d0af9acf)
