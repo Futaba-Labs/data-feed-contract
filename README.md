@@ -1,5 +1,3 @@
-# ETHOnline 2022 -- Futaba
-
 This is the official ETHOnline 2022 submission for our project Futaba 🍃.
 
 ## Project Description
